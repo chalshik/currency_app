@@ -8,9 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:currency_app/logic/main_page_func.dart';
 import 'package:currency_app/screens/history.dart';
 
-void main() {
-  runApp(MyApp());
-}
+const Map<String, String> currencySymbols = {
+  "RUB": "₽", // Российский рубль
+  "GBP": "£", // Британский фунт
+  "UZS": "сум", // Узбекский сум
+  "CNY": "¥", // Китайский юань
+  "KZT": "₸", // Казахстанский тенге
+  "TRY": "₺", // Турецкая лира
+  "EUR": "€", // Евро
+  "USD": "\$", // Доллар США
+};
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -40,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _rateController = TextEditingController();
   String _currency = "USD";
   String _rateType = "buy";
-  String _sub = 'US';
+  String symbol = "\$";
   double? _amount;
   double? _rate;
   String _result = '';
@@ -122,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: Icon(Icons.arrow_downward),
                     ),
-                    SizedBox(width: 50),
+                    SizedBox(width: 80),
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
@@ -135,76 +142,76 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 SizedBox(
-                  height: 30,
+                  height: 20,
                 ),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize
+                      .min, // Минимальный размер для row, чтобы содержимое не растягивалось
+                  mainAxisAlignment: MainAxisAlignment
+                      .center, // Центрирование элементов в ряду
                   children: [
-                    SizedBox(
-                      width: 50,
-                    ),
-                    Image.network(
-                      "https://flagsapi.com/$_sub/flat/64.png",
-                      width: 40,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
+                    // Символ валюты
                     Text(
-                      _amount.toString(),
+                      currencySymbols[_currency] ??
+                          '?', // Безопасное обращение к словарю
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                        width: 8), // Отступ между символом валюты и количеством
+
+                    // Сумма (с двумя знаками после запятой)
+                    Text(
+                      _amount != null
+                          ? _amount!.toStringAsFixed(2)
+                          : 'N/A', // Безопасная проверка _amount
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: Container(
-                          width: 90, // Уменьшаем ширину выпадающего списка
-                          child: DropdownButtonFormField<String>(
-                            value: _currency,
-                            icon: Transform.translate(
-                              offset: const Offset(0, -8),
-                              child: const Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.blue,
-                                size: 40,
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 24,
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            items: _currencies.map((currency) {
-                              return DropdownMenuItem<String>(
-                                value: currency,
-                                child: Text(currency),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _currency = value!;
-                                _sub = _currency.substring(0, 2);
-                              });
-                              _getCurrencyRate();
-                              // После выбора валюты получаем новый курс
-                            },
-                            decoration: const InputDecoration(
-                              labelText: 'Select Currency',
-                            ),
-                          ),
+                        width: 8), // Отступ между суммой и выпадающим списком
+
+                    // Выпадающий список для выбора валюты
+                    Container(
+                      width: 120, // Устанавливаем ширину для удобства
+                      child: DropdownButtonFormField<String>(
+                        value: _currency,
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.blue,
+                          size: 34,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        items: _currencies.map((currency) {
+                          return DropdownMenuItem<String>(
+                            value: currency,
+                            child: Text(currency),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _currency = value!;
+                          });
+                          _getCurrencyRate();
+                        },
+                        decoration: InputDecoration(
+                          isDense: false,
+                          contentPadding: EdgeInsets.symmetric(vertical: 16.0),
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
                   ],
                 ),
+
                 SizedBox(
-                  height: 10,
+                  height: 15,
                 ),
                 // Поле для ввода суммы
                 TextField(
@@ -217,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onChanged: (_) => _calculateProduct(),
                 ),
 
-                SizedBox(height: 16),
+                SizedBox(height: 24),
                 // Поле для отображения курса
                 TextField(
                   controller: _rateController,
@@ -228,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   onChanged: (_) => _calculateProduct(),
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 24),
                 // Карточка для отображения результата
                 Divider(
                   color: Colors.black, // Цвет линии
@@ -257,96 +264,73 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        // Считываем данные из текстовых полей
-                        String operationType = _rateType;
-                        String currency = _currency;
-                        double amount = double.tryParse(_controller1.text) ?? 0;
-                        double rate = _rate ?? 0;
+                    Material(
+                      color: Colors.blue, // Цвет фона кнопки
+                      shape: CircleBorder(), // Круглая форма
+                      child: IconButton(
+                        icon: Icon(Icons.add), // Иконка "Add"
+                        iconSize: 40, // Размер иконки
+                        color: Colors.white, // Цвет иконки
+                        onPressed: () async {
+                          // Считываем данные из текстовых полей
+                          String operationType = _rateType;
+                          String currency = _currency;
+                          double amount =
+                              double.tryParse(_controller1.text) ?? 0;
+                          double rate = _rate ?? 0;
 
-                        // Вызываем функцию и получаем результат
-                        String result = await addOperationHistory(
-                            operationType, currency, amount, rate);
-                        getAmount();
-                        // Показываем SnackBar с результатом
-                        if (_controller1.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Поле пустое!'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(result),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        }
+                          // Вызываем функцию и получаем результат
+                          String result = await addOperationHistory(
+                              operationType, currency, amount, rate);
+                          getAmount();
 
-                        // Очищаем текстовые поля
-                        if (result.startsWith('Успешно')) {
-                          _controller1.clear(); // Очистить поле для ввода суммы
-                          // Добавьте аналогичный вызов для других контроллеров, если нужно
-                        }
-                      },
-                      child: Text('Add'),
-                    ),
-                    SizedBox(width: 16),
-                    Column(children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(
-                              255, 44, 36, 197), // Красный цвет кнопки
-                          shape: CircleBorder(), // Круглая форма
-                          padding: EdgeInsets.all(20), // Отступы внутри кнопки
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => OperationsPage()),
-                          );
+                          // Показываем SnackBar с результатом
+                          if (_controller1.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Поле пустое!'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(result),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+
+                          // Очищаем текстовые поля
+                          if (result.startsWith('Успешно')) {
+                            _controller1
+                                .clear(); // Очистить поле для ввода суммы
+                          }
                         },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(
-                                    255, 44, 36, 197), // Цвет кнопки
-                                shape: CircleBorder(), // Круглая форма
-                                padding: EdgeInsets.all(
-                                    10), // Меньше отступов для уменьшения размера кнопки
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => OperationsPage(),
-                                  ),
-                                );
-                              },
-                              child: Icon(
-                                Icons.send, // Иконка send
-                                color: Colors.white, // Цвет иконки
-                                size: 32, // Размер иконки
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'Send', // Текст под кнопкой
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ])
+                    ),
+                    SizedBox(width: 50),
+                    Column(
+                      children: [
+                        Material(
+                          color: Colors.red, // Цвет фона
+                          shape: CircleBorder(), // Круглая форма
+                          child: IconButton(
+                            icon: Icon(Icons.history), // Иконка send
+                            iconSize: 40, // Размер иконки
+                            color: Colors.white, // Цвет иконки
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OperationsPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ],

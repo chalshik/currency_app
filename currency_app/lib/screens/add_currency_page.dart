@@ -11,38 +11,32 @@ class AddCurrencyPage extends StatefulWidget {
 }
 
 class _AddCurrencyPageState extends State<AddCurrencyPage> {
-  List<String> _currencies = []; // Список валют
-  String? _selectedCurrency; // Выбранная валюта
-  final TextEditingController _amountController =
-      TextEditingController(); // Контроллер для ввода количества
+  List<String> _currencies = [];
+  String? _selectedCurrency;
+  final TextEditingController _amountController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadCurrencies(); // Загружаем валюты при старте
+    _loadCurrencies();
   }
 
-  // Функция для загрузки валют
   Future<void> _loadCurrencies() async {
     try {
       final response = await http.get(
         Uri.parse('http://chigurick.pythonanywhere.com/currency/availbale/'),
       );
 
-      // Печатаем ответ для отладки
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Пробуем распарсить тело ответа
         final data = json.decode(response.body);
 
         if (data.containsKey('available_currencies')) {
           setState(() {
             _currencies = List<String>.from(data['available_currencies']);
-            _selectedCurrency = _currencies.isNotEmpty
-                ? _currencies[0]
-                : null; // Устанавливаем валюту по умолчанию
+            _selectedCurrency = _currencies.isNotEmpty ? _currencies[0] : null;
           });
         } else {
           print('Error: available_currencies not found in response.');
@@ -61,7 +55,6 @@ class _AddCurrencyPageState extends State<AddCurrencyPage> {
     }
   }
 
-  // Функция для открытия диалога с полем для ввода количества для KGS
   void _showKgsDialog() {
     showDialog(
       context: context,
@@ -140,36 +133,37 @@ class _AddCurrencyPageState extends State<AddCurrencyPage> {
                   );
                 }).toList(),
               ),
-              SizedBox(
-                  height:
-                      24), // Увеличиваем отступ между комбобоксом и кнопками
-              // Кнопка для добавления валюты с количеством 0
+              SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_selectedCurrency != null) {
-                    addCurrency(_selectedCurrency!,
-                        0.0); // Вызываем функцию с валютой и количеством 0
+                    // Ожидаем выполнения функции
+                    String result = await addCurrency(_selectedCurrency!, 0.0);
+
+                    // Показываем результат в Snackbar
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(result)),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Please select a currency first!')),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 32), // Увеличиваем размеры кнопки
-                  minimumSize:
-                      Size(200, 50), // Увеличиваем минимальный размер кнопки
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                  minimumSize: Size(200, 50),
                 ),
                 child: Text('Add Currency', style: TextStyle(fontSize: 20)),
               ),
-              SizedBox(height: 24), // Увеличиваем отступ между кнопками
-              // Кнопка для добавления KGS с открытием диалога для ввода количества
+              SizedBox(height: 24),
+
               ElevatedButton(
                 onPressed: _showKgsDialog,
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 32), // Увеличиваем размеры кнопки
-                  minimumSize:
-                      Size(200, 50), // Увеличиваем минимальный размер кнопки
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                  minimumSize: Size(200, 50),
                 ),
                 child: Text('Add KGS', style: TextStyle(fontSize: 20)),
               ),

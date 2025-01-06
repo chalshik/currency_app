@@ -23,38 +23,37 @@ class _OperationsPageState extends State<OperationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Operations List'),
-        ),
-        body: SingleChildScrollView(
-          scrollDirection:
-              Axis.horizontal, // Устанавливаем горизонтальное направление
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Фильтрация по типу операции
-              DropdownButton<String>(
-                value: _selectedType,
-                items: <String>[
-                  'buy',
-                  'sell',
-                ].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedType = newValue;
-                    operations = fetchOperationsByType(
-                        _selectedType); // Загружаем заново при изменении фильтра
-                  });
-                },
-                hint: const Text('Select Operation Type'),
-              ),
-              Expanded(
-                child: FutureBuilder<List<Map<String, dynamic>>>(
+      appBar: AppBar(
+        title: const Text('Operations List'),
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // Фильтрация по типу операции
+                DropdownButton<String>(
+                  value: _selectedType,
+                  items: <String>[
+                    'buy',
+                    'sell',
+                  ].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedType = newValue;
+                      operations = fetchOperationsByType(
+                          _selectedType); // Загружаем заново при изменении фильтра
+                    });
+                  },
+                  hint: const Text('Select Operation Type'),
+                ),
+                FutureBuilder<List<Map<String, dynamic>>>(
                   future: operations,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -66,6 +65,7 @@ class _OperationsPageState extends State<OperationsPage> {
                     } else {
                       var data = snapshot.data!;
                       return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
                         child: DataTable(
                           columns: const [
                             DataColumn(label: Text('User')),
@@ -100,9 +100,11 @@ class _OperationsPageState extends State<OperationsPage> {
                     }
                   },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

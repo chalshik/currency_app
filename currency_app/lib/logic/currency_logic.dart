@@ -1,24 +1,18 @@
-// currency_service.dart
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-// Функция для получения валют из API
 Future<List<Map<String, dynamic>>> fetchCurrencies() async {
   final response = await http.get(
       Uri.parse('http://chigurick.pythonanywhere.com/currency/currencies/'));
 
   if (response.statusCode == 200) {
-    // Если запрос успешен, парсим ответ
     List<dynamic> data = json.decode(response.body);
     return data.map((item) => item as Map<String, dynamic>).toList();
   } else {
-    // Если запрос неудачен, выбрасываем исключение
     throw Exception('Failed to load currencies');
   }
 }
 
-// Функция для получения количества по имени валюты
 Future<double?> getAmountByCurrency(String currencyName) async {
   try {
     List<Map<String, dynamic>> currencies = await fetchCurrencies();
@@ -32,7 +26,7 @@ Future<double?> getAmountByCurrency(String currencyName) async {
   }
 }
 
-Future<void> addCurrency(String currencyName, double amount) async {
+Future<String> addCurrency(String currencyName, double amount) async {
   final url =
       Uri.parse('http://chigurick.pythonanywhere.com/currency/add_currency/');
 
@@ -47,10 +41,10 @@ Future<void> addCurrency(String currencyName, double amount) async {
 
   if (response.statusCode == 201) {
     // Успешное добавление валюты
-    print('Currency added successfully: ${response.body}');
+    return 'Succesfully added';
   } else {
     // Ошибка
-    print('Failed to add currency: ${response.body}');
+    return 'Error';
   }
 }
 
@@ -67,7 +61,6 @@ Future<List<CurrencyStat>> fetchCurrencyStats() async {
   }
 }
 
-// Класс для представления статистики валют
 class CurrencyStat {
   final String currency;
   final String totalBuy;
