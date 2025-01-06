@@ -228,7 +228,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Поле для отображения курса
                 TextField(
                   controller: _rateController,
-                  readOnly: true,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Rate',
