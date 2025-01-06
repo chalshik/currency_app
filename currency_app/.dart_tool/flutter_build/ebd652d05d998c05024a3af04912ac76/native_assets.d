@@ -1,0 +1,1 @@
+ C:\\Users\\user\\Desktop\\devel_opera\\currency_app\\.dart_tool\\flutter_build\\ebd652d05d998c05024a3af04912ac76\\native_assets.yaml: 
