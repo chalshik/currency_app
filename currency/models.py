@@ -1,6 +1,3 @@
-from django.db import models
-from django.db import models
-from decimal import Decimal
 
 from django.db import models
 from decimal import Decimal
@@ -11,9 +8,6 @@ class Currency_Amount(models.Model):
     def __str__(self):
         return f"{self.name} - {self.amount}"
 
-from django.contrib.auth.models import User
-
-from django.db import models
 from django.contrib.auth.models import User
 
 class OperationHistory(models.Model):
@@ -38,8 +32,6 @@ class OperationHistory(models.Model):
     def __str__(self):
         return f"{self.operation_type.capitalize()} {self.amount} {self.currency} at {self.rate} per unit"
 
-from django.db import models
-from decimal import Decimal
 import logging
 
 logger = logging.getLogger(__name__)

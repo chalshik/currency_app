@@ -21,10 +21,8 @@ def login_view(request):
 def register_user(request):
     if request.method == 'POST':
         serializer = UserSerializer(data=request.data)
-        
-        # Проверка, что данные валидны
         if serializer.is_valid():
-            user = serializer.save()  # Сохраняем пользователя в базе
+            user = serializer.save()
             return Response({
                 'message': 'User created successfully!',
                 'username': user.username,
@@ -33,15 +31,7 @@ def register_user(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def get_all_users(request):
-    """
-    Получает всех зарегистрированных пользователей.
-    :param request: Запрос пользователя.
-    :return: JSON-ответ со списком всех пользователей.
-    """
-    # Получаем всех пользователей
     users = User.objects.all()
-
-    # Создаем список словарей с данными пользователей
     user_data = []
     for user in users:
         user_data.append({

@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-p5kp!-b@nqc$qef6f)e833f+78rgdzygx6=0xjrc%()*7bf=x1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['chigurick.pythonanywhere.com']
+ALLOWED_HOSTS = ['chigurick.pythonanywhere.com',
+                 '127.0.0.1']
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
